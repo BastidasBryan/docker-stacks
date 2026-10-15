@@ -1,0 +1,38 @@
+services:
+  mariadb:
+    image: ${MARIADB_IMAGE}
+    restart: always
+    environment:
+      - MARIADB_USER=${MOODLE_DB_USER}
+      - MARIADB_PASSWORD=${MOODLE_DB_PASS}
+      - MARIADB_DATABASE=${MOODLE_DB_NAME}
+      - MARIADB_ROOT_PASSWORD=${MOODLE_ROOT_PASS}
+      - MARIADB_CHARACTER_SET=utf8mb4
+      - MARIADB_COLLATE=utf8mb4_unicode_ci
+    volumes:
+      - moodle_db_data:/bitnami/mariadb
+
+  moodle:
+    image: ${MOODLE_IMAGE}
+    restart: always
+    depends_on:
+      - mariadb
+    ports:
+      - "${MOODLE_PORT}:8080"
+    environment:
+      - MOODLE_DATABASE_HOST=mariadb
+      - MOODLE_DATABASE_PORT_NUMBER=3306
+      - MOODLE_DATABASE_USER=${MOODLE_DB_USER}
+      - MOODLE_DATABASE_PASSWORD=${MOODLE_DB_PASS}
+      - MOODLE_DATABASE_NAME=${MOODLE_DB_NAME}
+      - MOODLE_USERNAME=${MOODLE_ADMIN_USER}
+      - MOODLE_PASSWORD=${MOODLE_ADMIN_PASS}
+      - MOODLE_HOST=${MOODLE_HOST}
+    volumes:
+      - moodle_data:/bitnami/moodle
+      - moodledata_data:/bitnami/moodledata
+
+volumes:
+  moodle_db_data:
+  moodle_data:
+  moodledata_data:
